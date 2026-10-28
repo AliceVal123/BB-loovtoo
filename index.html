@@ -103,6 +103,14 @@
     .intro h1 { font-size:clamp(36px,4vw,56px); }
     .summary { min-height:91px; }
     .court { height:310px; margin-top:15px; }
+    .round-summary { position:absolute; z-index:10; inset:0; box-sizing:border-box; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:20px; border-radius:inherit; background:linear-gradient(155deg,#f1fbf9f5,#cde9e6f8); backdrop-filter:blur(4px); text-align:center; }
+    .round-summary[hidden], .round-summary [hidden] { display:none!important; }
+    .round-summary-kicker { color:#0b807a; font-size:12px; font-weight:800; letter-spacing:.12em; text-transform:uppercase; }
+    .round-summary-score { margin:5px 0 -7px; color:var(--navy); font-size:78px; font-weight:900; line-height:1; font-variant-numeric:tabular-nums; }
+    .round-summary-unit { color:#4c7281; font-size:16px; font-weight:700; }
+    .round-replay { width:min(215px,100%); margin-top:23px; padding:13px 18px; border:0; border-radius:12px; background:#0bc5a4; color:#fff; font:inherit; font-size:13px; font-weight:800; box-shadow:0 8px 17px #0aaa8e36; cursor:pointer; }
+    .round-replay:hover { background:#08ad91; }
+    .round-no-turns { max-width:230px; margin-top:23px; color:#426d7c; font-size:13px; font-weight:700; line-height:1.4; }
     .hoop { animation-duration:2.2s; }
     @keyframes hoop-slide { from { transform:translateX(calc(-50% - 80px)); } to { transform:translateX(calc(-50% + 80px)); } }
     .court .ball:disabled { opacity:.45; }
@@ -167,6 +175,13 @@
               <div class="aim" id="aim"></div>
               <span class="ball-hint" id="ballHint">Puuduta palli ja viska</span>
               <button class="ball" id="ball" type="button" aria-label="Puuduta palli mängu alustamiseks ja lohista korvi suunas"><svg class="ball-seams" viewBox="0 0 100 100" aria-hidden="true"><path d="M50 0v100M0 50h100M17 6C41 29 41 71 17 94M83 6C59 29 59 71 83 94"/></svg></button>
+              <div class="round-summary" id="roundSummary" role="status" aria-live="polite" hidden>
+                <span class="round-summary-kicker">Mängukord läbi</span>
+                <span class="round-summary-score" id="roundSummaryScore">0</span>
+                <span class="round-summary-unit">punkti</span>
+                <button class="round-replay" id="replayButton" type="button">Mängi uuesti</button>
+                <span class="round-no-turns" id="roundNoTurns" hidden>Mängukordi ei ole praegu järel.</span>
+              </div>
             </div>
             <div class="result neutral" id="result" role="status" aria-live="polite"><span class="result-icon">↗</span><span id="resultText">Vajuta pallile ja lohista see liikuvasse korvi.</span></div>
             <div class="note">Loovtöö prototüüp · mänguandmed on näitlikud.</div>
@@ -179,9 +194,9 @@
             <h3 class="panel-title">Auhinnad</h3>
             <div class="prize-grid">
               <div class="prize-card"><div class="prize-art"><svg viewBox="0 0 64 64" aria-hidden="true"><path d="M10 17h44v10a6 6 0 0 0 0 10v10H10V37a6 6 0 0 0 0-10V17z"/><path d="M32 18v28" stroke-dasharray="3 4"/></svg></div><strong>5 × 2</strong><span>mängupiletit</span></div>
-              <div class="prize-card"><div class="prize-art"><svg viewBox="0 0 64 64" aria-hidden="true"><path d="M22 12l10 5 10-5 11 8-6 11-7-4v27H24V27l-7 4-6-11 11-8z"/></svg></div><strong>4</strong><span>Jordan sinine T-särk │ Bigbank/Kalev</span></div>
-              <div class="prize-card"><div class="prize-art"><svg viewBox="0 0 64 64" aria-hidden="true"><path d="M21 16c0-8 5-12 11-12s11 4 11 12l10 8-6 11-6-4v25H23V31l-6 4-6-11 10-8z"/><path d="M22 16c0 7 4 12 10 12s10-5 10-12M26 42h12"/></svg></div><strong>2</strong><span>Jordan sinine lukuga pusa │ Bigbank/Kalev</span></div>
-              <div class="prize-card"><div class="prize-art"><svg viewBox="0 0 64 64" aria-hidden="true"><circle cx="24" cy="10" r="6"/><path d="M18 22h12l2 16H16l2-16zM16 38h16l-2 11h-5l-1-5-1 5h-5l-2-11zM18 25L9 37M30 25l10 5 5-5M19 49l-3 11M29 49l3 11M21 30h6"/><circle cx="53" cy="25" r="8"/><path d="M45 25h16M53 17v16M47 20c4 3 4 7 0 10M59 20c-4 3-4 7 0 10"/></svg></div><strong>1</strong><span>treening Bigbank/Kalevi mängijaga</span></div>
+              <div class="prize-card"><div class="prize-art"><svg viewBox="0 0 64 64" aria-hidden="true"><path d="M22 12l10 5 10-5 11 8-6 11-7-4v27H24V27l-7 4-6-11 11-8z"/></svg></div><strong>4</strong><span>Bigbank/Kalev T-särki</span></div>
+              <div class="prize-card"><div class="prize-art"><svg viewBox="0 0 64 64" aria-hidden="true"><path d="M21 16c0-8 5-12 11-12s11 4 11 12l10 8-6 11-6-4v25H23V31l-6 4-6-11 10-8z"/><path d="M22 16c0 7 4 12 10 12s10-5 10-12M26 42h12"/></svg></div><strong>2</strong><span>Bigbank/Kalev Jordan pusa</span></div>
+              <div class="prize-card"><div class="prize-art"><svg viewBox="0 0 64 64" aria-hidden="true"><circle cx="24" cy="10" r="6"/><path d="M18 22h12l2 16H16l2-16zM16 38h16l-2 11h-5l-1-5-1 5h-5l-2-11zM18 25L9 37M30 25l10 5 5-5M19 49l-3 11M29 49l3 11M21 30h6"/><circle cx="53" cy="25" r="8"/><path d="M45 25h16M53 17v16M47 20c4 3 4 7 0 10M59 20c-4 3-4 7 0 10"/></svg></div><strong>1</strong><span>treening koos Bigbank/Kalev mängijaga</span></div>
             </div>
           </section>
 
@@ -192,7 +207,7 @@
             <div class="rule-card"><h3>Mäng</h3><p>Üks mängukord kestab 30 sekundit ja algab 0 punktist. Selle aja jooksul saab mängija visata nii palju kordi, kui jõuab. Iga tabav vise annab 2 punkti. Päeva edetabelis arvestatakse mängija parimat mängukorra tulemust.</p></div>
             <div class="rule-card"><h3>Mängukorrad</h3><p>Bigbanki kontoga liitudes saab mängija 3 mängukorda. Need kanduvad kasutamata jätmisel järgmistele päevadele. Liitumispäeval eraldi igapäevast mängukorda ei lisandu.</p><p>Edaspidi saab mängija iga päev ühe uue mängukorra, mis ei kandu järgmisesse päeva. Kui mängija teeb samal päeval Bigbanki kontolt ülekande või maksab kaardiga, saab ta selle päeva eest ühe lisamängukorra. Mitu tehingut ühel päeval ei anna mitut lisakorda.</p></div>
             <div class="rule-card"><h3>Igapäevane auhind</h3><p>Iga päev kell 23.59 selgub päeva edetabeli esikolmik. Kõik kolm mängijat saavad ühe tavalise mängupileti. Välja antakse alati kolm piletit, ka võrdsete skooride korral. Võrdse skoori puhul võetakse järjestamisel arvesse eelmise päeva skoori ja seejärel pikemat järjestikuste mängupäevade seeriat.</p></div>
-            <div class="rule-card"><h3>Igakuine loos</h3><p>Detsembri loosis osalevad mängijad, kes on mänginud ja olnud oma skooriga edetabeli 100 parima seas. Novembri 28.–30. mängutulemused lähevad detsembri arvestusse; novembris eraldi loosimist ei toimu.</p><p>Iga kuu loositakse välja 5 × 2 tavalist mängupiletit, 4 Jordan sinist T-särki, 2 Jordan sinist lukuga pusa ja üks treening Kalevi mängijaga.</p></div>
+            <div class="rule-card"><h3>Igakuine loos</h3><p>Detsembri loosis osalevad mängijad, kes on mänginud ja olnud oma skooriga edetabeli 100 parima seas. Novembri 28.–30. mängutulemused lähevad detsembri arvestusse; novembris eraldi loosimist ei toimu.</p><p>Iga kuu loositakse välja 5 × 2 tavalist mängupiletit, 4 Bigbank/Kalev T-särki, 2 Bigbank/Kalev Jordan pusa ja 1 treening koos Bigbank/Kalev mängijaga.</p></div>
             <div class="rule-card"><h3>Kampaania kestus</h3><p>Avalik avaüritus ja äpimängu käivitamine toimuvad 28. novembril. Kampaania üritused ja aktiivne kommunikatsioon lõpevad detsembris, kuid mäng jääb kasutatavaks hooaja lõpuni.</p></div>
             <div class="rule-card"><h3>Koolitöö prototüüp</h3><p>Tegemist on aine „Mittetraditsioonilised käsitlused turunduses” loovtööga. Ideede autorid: Erle Paas, Alice Valge, Helena Veerla ja Eveliis Väljaots.</p><p>Kogu kampaania, mängureeglid, auhinnad ja näidisandmed on välja mõeldud ainult koolitöö jaoks. Bigbank AS ei ole sellest kontseptsioonist teadlik ega sellega seotud.</p></div>
             <button class="reset" id="resetButton" type="button">Alusta näidist uuesti</button>
@@ -215,7 +230,7 @@
     score: 0, todayScore: 0, roundScore: 0, monthScore: 0,
     joiningTurns: 3, dailyTurns: 0, extraTurns: 0, transactionUsed: false, usageDays: 0,
     date: new Date(2026, 10, 28), dayIndex: 0, yesterdayScore: 0,
-    streak: 0, lastPlayedDay: -2, active: false, busy: false,
+    streak: 0, lastPlayedDay: -2, active: false, busy: false, roundFinished: false,
     timeLeft: GAME_SECONDS, deadline: 0, interval: null, flightTimeout: null, drag: null,
   });
   const state = initialState();
@@ -259,7 +274,12 @@
     $('timer').classList.toggle('urgent', state.active && state.timeLeft <= 10);
     $('availableTurns').textContent = availableTurns();
     $('usageDays').textContent = state.usageDays;
-    ball.disabled = state.busy || (!state.active && availableTurns() === 0);
+    const showRoundSummary = state.roundFinished && !state.active;
+    $('roundSummary').hidden = !showRoundSummary;
+    $('roundSummaryScore').textContent = state.roundScore;
+    $('replayButton').hidden = availableTurns() === 0;
+    $('roundNoTurns').hidden = availableTurns() > 0;
+    ball.disabled = state.busy || state.roundFinished || (!state.active && availableTurns() === 0);
     court.classList.toggle('playing', state.active);
     $('ballHint').textContent = state.active ? 'Arvesta korvi liikumisega' : availableTurns() ? 'Puuduta palli ja viska' : 'Mängukordi pole järel';
     $('transactionButton').disabled = state.transactionUsed || state.active;
@@ -282,11 +302,12 @@
     clearInterval(state.interval);
     state.interval = null;
     state.active = false;
+    state.roundFinished = true;
     state.timeLeft = 0;
     state.drag = null;
     resetBall();
     $('hoop').style.animationPlayState = 'running';
-    result(`Aeg läbi! Selles mängukorras kogusid ${state.roundScore} punkti.${availableTurns() ? ' Puuduta palli uue mängu alustamiseks.' : ''}`, state.roundScore > 0);
+    result(`Aeg läbi! Selles mängukorras kogusid ${state.roundScore} punkti.`, state.roundScore > 0);
     render();
   }
   function tick() {
@@ -301,6 +322,7 @@
     else if (state.extraTurns) state.extraTurns--;
     else state.joiningTurns--;
     state.active = true;
+    state.roundFinished = false;
     state.busy = false;
     state.timeLeft = GAME_SECONDS;
     state.score = 0;
@@ -355,6 +377,7 @@
     state.todayScore = 0;
     state.score = 0;
     state.roundScore = 0;
+    state.roundFinished = false;
     state.timeLeft = GAME_SECONDS;
     state.dayIndex++;
     state.date.setDate(state.date.getDate()+1);
@@ -396,6 +419,7 @@
   ball.addEventListener('pointerup', finish);
   ball.addEventListener('pointercancel', () => { state.drag=null; resetBall(); });
   ball.addEventListener('click', () => { if (!state.active) startRound(); });
+  $('replayButton').addEventListener('click', startRound);
   $('transactionButton').addEventListener('click', () => {
     if (state.transactionUsed || state.active) return;
     state.transactionUsed = true;
